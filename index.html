@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <link   rel="stylesheet"    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link   rel="stylesheet"    href="./assets/css/styles.css"  />
+</head>
+<body>
+    <!--creates the header-->
+    <header class="d-flex row justify-content-center headerbox">
+        Weather Dashboard
+    </header>
+
+    <main class="row">
+        <!--sidebar/search area-->
+        <section class="col-3">
+            <h2 class="d-flex col justify-content-center">Search for a City:</h2>
+            <input class="col mb-3" placeholder="San Diego" id="city-search"></input>
+            <button class="col mb-3 rounded-lg" id="search-button">Search</button>
+
+            <!--bar separating search and past searches-->
+            <div class="d-flex justify-content-center bg-dark" id="bar"></div>
+
+            <section id="past-searches"></section>
+        </section>
+        
+        <!--City Forecast Data-->
+        <section class="col-9 bg-dark vh-100" id="output-zone">
+        </section>
+    </main>
+
+    <script src="./assets/js/script.js"></script>
+</body>
+</html>
