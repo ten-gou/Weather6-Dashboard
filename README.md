@@ -8,3 +8,4 @@ In addition, once you use the search, the entry is logged on the sidebar, which 
 ## Screenshots
 
 ## LINK TO THE DEPLOYED WEBSITE
+https://ten-gou.github.io/W6-Weather-Dashboard/
