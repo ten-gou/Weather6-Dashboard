@@ -4,9 +4,8 @@
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     font-size: 30px;
     color: aliceblue;
-    margin: 5% 10%;
 }
-main section h2 {
+main #search-zone h2 {
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     font-size: 25px;
 }
@@ -24,4 +23,8 @@ main #bar {
 }
 #past-search-entry {
     color: aliceblue;
+}
+#output-zone h2 {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 40px;
 }
