@@ -1,5 +1,6 @@
 var citySearchEl = document.getElementById('city-search');
 var searchButtonEl = document.getElementById('search-button');
+var resetButtonEl = document. getElementById('reset-button');
 var outputEl = document.getElementById('output-zone');
 var pastSearchEl = document.getElementById('past-searches');
 
@@ -284,7 +285,16 @@ var pastSearch4City = function(elem) {
 
 }
 
+var resetSearch = function() {
+    localStorage.clear();
+
+    while (pastSearchEl.hasChildNodes()) {
+        pastSearchEl.removeChild(pastSearchEl.firstChild);
+    }
+}
+
 // Adds eventListener for searchButton to log input value
 searchButtonEl.addEventListener('click', search4City);
+resetButtonEl.addEventListener('click', resetSearch);
 
 pastSearches();

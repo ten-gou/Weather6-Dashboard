@@ -13,7 +13,7 @@ main #bar {
     height: 10px;
     border-radius: 50%;
 }
-#search-button {
+#search-button, #reset-button {
     background-color: rgb(101, 171, 218);
     color: aliceblue;
     border: cornsilk;
