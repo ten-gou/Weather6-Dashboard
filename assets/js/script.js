@@ -82,15 +82,14 @@ var fetchWeather = function() {
                 wind.className = 'm-4';
                 var humidity = document.createElement('p');
                 humidity.className = 'm-4';
-                var uv = document.createElement('p');
-                uv.className = 'm-4';
+                var uv = document.createElement('div');
+                uv.className = 'd-flex m-4 row align-items-centered';
 
                 cityName.innerHTML = '<h2>' + citySearchEl.value + ' (' + formattedTime + ')</h2> <img src = "http://openweathermap.org/img/wn/' + data.current.weather[0].icon + '@2x.png" />';
                 temp.textContent = 'Temperature: ' + data.current.temp + '°F';
                 wind.textContent = 'Wind: ' + data.current.wind_speed + ' MPH';
                 humidity.textContent = 'Humidity: ' + data.current.humidity + '%';
-                uv.textContent = 'UV Index: ' + data.current.uvi;
-
+                uv.innerHTML = '<p class="mr-2 mt-3">UV Index: </p><div class="rounded-lg p-2 m-2" id="uv-index">' + data.current.uvi + '</div>';
 
                 // creates a div box that holds city info 
                 box.appendChild(cityName);
@@ -99,6 +98,29 @@ var fetchWeather = function() {
                 box.appendChild(humidity);
                 box.appendChild(uv);
                 outputEl.appendChild(box);
+                
+                var uvIndex = document.getElementById('uv-index');
+
+                if (data.current.uvi >= 11) {
+                    //purple
+                    uvIndex.style.backgroundColor = '#6c4dbd';
+                }
+                else if (data.current.uvi >= 8) {
+                    //red
+                    uvIndex.style.backgroundColor = '#d22222';
+                }
+                else if (data.current.uvi >= 6) {
+                    //orange
+                    uvIndex.style.backgroundColor = '#f5882f';
+                }
+                else if (data.current.uvi >= 3) {
+                    //yellow
+                    uvIndex.style.backgroundColor = '#ffd966'; 
+                }
+                else {
+                    //green
+                    uvIndex.style.backgroundColor = '#51ed40'; 
+                }
 
                 var futaForecast = document.createElement('div');
                 futaForecast.className = 'd-flex row col justify-content-between mx-auto';
@@ -218,15 +240,14 @@ var pastSearch4City = function(elem) {
                 wind.className = 'm-4';
                 var humidity = document.createElement('p');
                 humidity.className = 'm-4';
-                var uv = document.createElement('p');
-                uv.className = 'm-4';
+                var uv = document.createElement('div');
+                uv.className = 'd-flex m-4 row align-items-centered';
 
                 cityName.innerHTML = '<h2>' + searchEl.innerText + ' (' + formattedTime + ')</h2> <img src = "http://openweathermap.org/img/wn/' + data.current.weather[0].icon + '@2x.png" />';
                 temp.textContent = 'Temperature: ' + data.current.temp + '°F';
                 wind.textContent = 'Wind: ' + data.current.wind_speed + ' MPH';
                 humidity.textContent = 'Humidity: ' + data.current.humidity + '%';
-                uv.textContent = 'UV Index: ' + data.current.uvi;
-
+                uv.innerHTML = '<p class="mr-2 mt-3">UV Index: </p><div class="rounded-lg p-2 m-2" id="uv-index">' + data.current.uvi + '</div>';
 
                 // creates a div box that holds city info 
                 box.appendChild(cityName);
@@ -235,6 +256,30 @@ var pastSearch4City = function(elem) {
                 box.appendChild(humidity);
                 box.appendChild(uv);
                 outputEl.appendChild(box);
+
+
+                var uvIndex = document.getElementById('uv-index');
+
+                if (data.current.uvi >= 11) {
+                    //purple
+                    uvIndex.style.backgroundColor = '#6c4dbd';
+                }
+                else if (data.current.uvi >= 8) {
+                    //red
+                    uvIndex.style.backgroundColor = '#d22222';
+                }
+                else if (data.current.uvi >= 6) {
+                    //orange
+                    uvIndex.style.backgroundColor = '#f5882f';
+                }
+                else if (data.current.uvi >= 3) {
+                    //yellow
+                    uvIndex.style.backgroundColor = '#ffd966'; 
+                }
+                else {
+                    //green
+                    uvIndex.style.backgroundColor = '#51ed40'; 
+                }
 
                 var futaForecast = document.createElement('div');
                 futaForecast.className = 'd-flex row col justify-content-between mx-auto';
