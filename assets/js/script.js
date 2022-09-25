@@ -7,6 +7,7 @@ var pastSearchEl = document.getElementById('past-searches');
 var searchEl = document.createElement('button');
 
 var i = localStorage.getItem("i", JSON.stringify(i));
+console.log(i)
 
 // checks if values have already been set
 if (i > 0) {
@@ -21,12 +22,9 @@ var search4City = function() {
     // checks if city has been inputted
     if (citySearchEl.value.length > 0) {
         // logs it to the localStorage
-        localStorage.setItem("past-search-" + i, JSON.stringify(citySearchEl.value));
+        localStorage.setItem("i", JSON.stringify(citySearchEl.value));
 
         //logs the increased check to the value
-        i++;
-        localStorage.setItem("i", JSON.stringify(i));
-        console.log(i);
         fetchWeather();
     }
     else {
@@ -179,8 +177,7 @@ var pastSearches = function() {
     console.log(numero);
 
     for (i = 0; i < numero; i++) {
-    var text2 = localStorage.getItem("past-search-" + i, JSON.stringify(citySearchEl));
-    var text = text2.replaceAll('"', '');
+    var text = localStorage.getItem("past-search-" + i, JSON.stringify(citySearchEl));
 
 
     //creates past searches
