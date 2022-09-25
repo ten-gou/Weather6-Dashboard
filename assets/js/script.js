@@ -4,6 +4,8 @@ const searchEl = document.getElementById('search-button');
 const resetEl = document.getElementById('reset-button');
 const outputEl = document.getElementById('output-zone');
 const pastEl = document.getElementById('past-searches');
+const searchZoneEl = document.getElementById('search-zone');
+const mainEl = document.getElementById('main-zone');
 
 //retrieves past searches
 var iNum = localStorage.getItem('iNum', JSON.stringify(iNum));
@@ -130,12 +132,12 @@ const fetchWeather = (input) => {
                     outputEl.appendChild(forecastTitle);
 
                     const forecast = document.createElement('div');
-                    forecast.className = 'd-flex row col justify-content-between mx-auto';
+                    forecast.className = 'd-flex row row align-items-center justify-content-between mx-auto';
 
                     for (p=1; p<6; p++) {
                         const iForecast = document.createElement('div');
                         iForecast.setAttribute('date', p);
-                        iForecast.className = 'bg-secondary p-2 rounded-lg';
+                        iForecast.className = 'bg-secondary p-2 rounded-lg col';
 
                         const iForeDate = document.createElement('h4');
                         iForeDate.textContent = time(data, p);
@@ -215,7 +217,25 @@ const time = (data, time) => {
     return formatTime;
 }
 
+const size = window.matchMedia('(max-width: 800px)');
+
+const react = (size) => {
+    if (size.matches) {
+        outputEl.className = 'col bg-dark align-self-stretch p-5';
+        searchZoneEl.className = 'col';
+        mainEl.className = "d-flex flex-column";
+    }
+    else {
+        outputEl.className = 'col-8 bg-dark align-self-stretch p-5';
+        searchZoneEl.className = 'col-3';
+        mainEl.className = "d-flex flex-row";
+    }
+}
+
+pastSearch();
+react(size);
+
+size.addEventListener('change', react);
 searchEl.addEventListener('click', citySearch);
 resetEl.addEventListener('click', resetSearch);
 
-pastSearch();
