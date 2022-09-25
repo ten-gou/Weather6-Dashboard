@@ -1,341 +1,221 @@
-var citySearchEl = document.getElementById('city-search');
-var searchButtonEl = document.getElementById('search-button');
-var resetButtonEl = document. getElementById('reset-button');
-var outputEl = document.getElementById('output-zone');
-var pastSearchEl = document.getElementById('past-searches');
+//gets elements of the html
+const cityEl = document.getElementById('city-search');
+const searchEl = document.getElementById('search-button');
+const resetEl = document.getElementById('reset-button');
+const outputEl = document.getElementById('output-zone');
+const pastEl = document.getElementById('past-searches');
 
-var searchEl = document.createElement('button');
-
-var i = localStorage.getItem("i", JSON.stringify(i));
-console.log(i)
+//retrieves past searches
+var iNum = localStorage.getItem('iNum', JSON.stringify(iNum));
 
 // checks if values have already been set
-if (i > 0) {
-    console.log(i);
+if (iNum > 0) {
+    console.log(iNum);
 }
 else {
-    i = 0;
+    iNum = 0;
 }
 
-// FXN that logs the value of the input, and will eventually pull the search from OpenWeather
-var search4City = function() {
-    // checks if city has been inputted
-    if (citySearchEl.value.length > 0) {
-        // logs it to the localStorage
-        localStorage.setItem("i", JSON.stringify(citySearchEl.value));
+//clear past searches
+const clearSearch = () => {
+    while (pastEl.hasChildNodes()) {
+        pastEl.removeChild(pastEl.firstChild);
+    }
 
-        //logs the increased check to the value
-        fetchWeather();
+    iNum = 0;
+}
+
+//fxn logging value of input
+const citySearch = () => {
+    console.log(cityEl.value)
+    if (cityEl.value.length > 0) {
+        //logs to localStorage
+        localStorage.setItem(`past-search-${iNum}`, JSON.stringify(cityEl.value));
+
+        //logs the value of the searchEl to use in the fetchWeather
+        var input = cityEl.value;
+
+        iNum++;
+        localStorage.setItem('iNum', JSON.stringify(iNum));
+
+        //runs fetchWeather()
+        fetchWeather(input);
     }
     else {
-        window.alert("Please input a city!");
+        window.alert('Please input a city!');
     }
 
-    pastSearches();
+    pastSearch();
 }
 
-// FXN that fetches the weather data from the API
-var fetchWeather = function() {
-    var citi = citySearchEl.value;
-    var citiSearch = citi.replace(" ", '%20');
-    var requestUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + citiSearch + '&units=imperial&APPID=ce51c2ca519b1ea5d5c532a5addc38fe';
+//fxn fetches data from API
+const fetchWeather = (input) => {
+    const reqUrl = `https://api.openweathermap.org/data/2.5/weather?q=${input}&units=imperial&APPID=ce51c2ca519b1ea5d5c532a5addc38fe`
 
-    fetch(requestUrl)
-      .then(function(response) {
-        return response.json();
-    })
-      .then(function(data) {
-        // Checks if something is already in the output zone
-        while (outputEl.firstChild) {
-            outputEl.removeChild(outputEl.firstChild);
-        }
-
-        var lati = data.coord.lat;
-        var long = data.coord.lon;
-        var requestUrl2 = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + lati +'&lon=' + long + '&units=imperial&APPID=ce51c2ca519b1ea5d5c532a5addc38fe';
-
-        fetch(requestUrl2)
-            .then(function(response) {
-                return response.json();
+    fetch(reqUrl)
+        .then(function(response) {
+            return response.json();
         })
-            .then(function(data) {
-                console.log(data);
+        .then(function(data) {
+            //clears output
+            while (outputEl.firstChild) {
+                outputEl.removeChild(outputEl.firstChild);
+            }
+            
+            //logs lat and lon for the next call
+            const lat = data.coord.lat;
+            const lon = data.coord.lon;
+            const reqUrl2 = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&APPID=ce51c2ca519b1ea5d5c532a5addc38fe`
 
-                var unix_timestamp = data.daily[0].dt;
-                var date = new Date(unix_timestamp * 1000);
-                var dated = date.getDate();
-                var datem = date.getMonth() + 1;
-                var datey = date.getFullYear();
-                
-                var formattedTime = datem + '/' + dated + '/' + datey;
-
-                var box = document.createElement('div');
-                box.className = 'p-2 m-3 bg-secondary rounded-lg h-50';
-                var cityName = document.createElement('div');
-                cityName.className = 'd-flex row m-2 p-2 align-items-center'
-                var temp = document.createElement('p');
-                temp.className = 'm-4';
-                var wind = document.createElement('p');
-                wind.className = 'm-4';
-                var humidity = document.createElement('p');
-                humidity.className = 'm-4';
-                var uv = document.createElement('div');
-                uv.className = 'd-flex m-4 row align-items-centered';
-
-                cityName.innerHTML = '<h2>' + citySearchEl.value + ' (' + formattedTime + ')</h2> <img src = "http://openweathermap.org/img/wn/' + data.current.weather[0].icon + '@2x.png" />';
-                temp.textContent = 'Temperature: ' + data.current.temp + '°F';
-                wind.textContent = 'Wind: ' + data.current.wind_speed + ' MPH';
-                humidity.textContent = 'Humidity: ' + data.current.humidity + '%';
-                uv.innerHTML = '<p class="mr-2 mt-3">UV Index: </p><div class="rounded-lg p-2 m-2" id="uv-index">' + data.current.uvi + '</div>';
-
-                // creates a div box that holds city info 
-                box.appendChild(cityName);
-                box.appendChild(temp);
-                box.appendChild(wind);
-                box.appendChild(humidity);
-                box.appendChild(uv);
-                outputEl.appendChild(box);
-                
-                var uvIndex = document.getElementById('uv-index');
-
-                if (data.current.uvi >= 11) {
-                    //purple
-                    uvIndex.style.backgroundColor = '#6c4dbd';
-                }
-                else if (data.current.uvi >= 8) {
-                    //red
-                    uvIndex.style.backgroundColor = '#d22222';
-                }
-                else if (data.current.uvi >= 6) {
-                    //orange
-                    uvIndex.style.backgroundColor = '#f5882f';
-                }
-                else if (data.current.uvi >= 3) {
-                    //yellow
-                    uvIndex.style.backgroundColor = '#ffd966'; 
-                }
-                else {
-                    //green
-                    uvIndex.style.backgroundColor = '#51ed40'; 
-                }
-
-                var futaForecast = document.createElement('div');
-                futaForecast.className = 'd-flex row col justify-content-between mx-auto';
-
-                var futaForecasthead = document.createElement('h3');
-                futaForecasthead.textContent = "5-Day Forecast";
-                futaForecasthead.className = 'd-flex justify-content-center';
-
-                outputEl.appendChild(futaForecasthead);
-
-                for(p = 1; p < 6; p++) {
-                    var indivFutaForecast = document.createElement('div');
-                    indivFutaForecast.setAttribute('date', p);
-                    indivFutaForecast.className = 'bg-secondary p-2 rounded-lg';
-                    var indivFutaForecastD = document.createElement('h4');
-                    var indivFutaForecastWeat = document.createElement('img');
-                    indivFutaForecastWeat.className = 'd-flex justify-content-center';
-                    var indivFutaForecastTemp = document.createElement('p');
-                    var indivFutaForecastWind = document.createElement('p');
-                    var indivFutaForecastHumi = document.createElement('p');
-
-
-                    var unix_timestamp = data.daily[p].dt;
-                    var date = new Date(unix_timestamp * 1000);
-                    var dated = date.getDate();
-                    var datem = date.getMonth() + 1;
-                    var datey = date.getFullYear();
+            fetch(reqUrl2)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    //creates the elements holding city info
+                    const box = document.createElement('div');
+                    box.className = 'p-2 m-3 bg-secondary rounded-lg h-50';
                     
-                    var formattedTime = datem + '/' + dated + '/' + datey;
-                    console.log(formattedTime);
-                
-                    indivFutaForecastD.textContent = formattedTime;
-                    indivFutaForecastWeat.src = 'http://openweathermap.org/img/wn/' + data.daily[p].weather[0].icon + '@2x.png';
-                    indivFutaForecastTemp.textContent = 'Temp: ' + data.daily[p].temp.day + '°F';
-                    indivFutaForecastWind.textContent = 'Wind: ' + data.daily[p].wind_speed + ' MPH';
-                    indivFutaForecastHumi.textContent = 'Humidity: ' + data.daily[p].humidity + '%';
-
-                    indivFutaForecast.appendChild(indivFutaForecastD);
-                    indivFutaForecast.appendChild(indivFutaForecastWeat);
-                    indivFutaForecast.appendChild(indivFutaForecastTemp);
-                    indivFutaForecast.appendChild(indivFutaForecastWind);
-                    indivFutaForecast.appendChild(indivFutaForecastHumi);
-                    futaForecast.appendChild(indivFutaForecast);
-                }
-                    outputEl.appendChild(futaForecast);
-        })
-    })
-}
-
-// logs past searches
-var pastSearches = function() {
-    while (pastSearchEl.hasChildNodes()) {
-        pastSearchEl.removeChild(pastSearchEl.firstChild);
-    }
-
-    var numero = localStorage.getItem("i", JSON.stringify(i));
-    console.log(numero);
-
-    for (i = 0; i < numero; i++) {
-    var text = localStorage.getItem("past-search-" + i, JSON.stringify(citySearchEl));
-
-
-    //creates past searches
-    var searchEl = document.createElement('button');
-    searchEl.textContent = text;
-    searchEl.className = "d-flex col justify-content-center bg-dark mb-3 my-3 rounded";
-    searchEl.id = "past-search-entry";
-    searchEl.setAttribute("onclick", 'pastSearch4City(this)'); //attaches a FXN to each button
-
-    pastSearchEl.appendChild(searchEl);
-    }
-}
-var pastSearch4City = function(elem) {
-    var searchEl = elem;
-    var citi = searchEl.innerText;
-
-    var citiSearch = citi.replace(" ", '%20');
-    var requestUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + citiSearch + '&units=imperial&APPID=ce51c2ca519b1ea5d5c532a5addc38fe';
-
-    fetch(requestUrl)
-      .then(function(response) {
-        return response.json();
-    })
-      .then(function(data) {
-        // Checks if something is already in the output zone
-        while (outputEl.firstChild) {
-            outputEl.removeChild(outputEl.firstChild);
-        }
-
-        var lati = data.coord.lat;
-        var long = data.coord.lon;
-        var requestUrl2 = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + lati +'&lon=' + long + '&units=imperial&APPID=ce51c2ca519b1ea5d5c532a5addc38fe';
-
-        fetch(requestUrl2)
-            .then(function(response) {
-                return response.json();
-        })
-            .then(function(data) {
-                console.log(data);
-
-                var unix_timestamp = data.daily[0].dt;
-                var date = new Date(unix_timestamp * 1000);
-                var dated = date.getDate();
-                var datem = date.getMonth() + 1;
-                var datey = date.getFullYear();
-                
-                var formattedTime = datem + '/' + dated + '/' + datey;
-
-                var box = document.createElement('div');
-                box.className = 'p-2 m-3 bg-secondary rounded-lg h-50';
-                var cityName = document.createElement('div');
-                cityName.className = 'd-flex row m-2 p-2 align-items-center';
-                var temp = document.createElement('p');
-                temp.className = 'm-4';
-                var wind = document.createElement('p');
-                wind.className = 'm-4';
-                var humidity = document.createElement('p');
-                humidity.className = 'm-4';
-                var uv = document.createElement('div');
-                uv.className = 'd-flex m-4 row align-items-centered';
-
-                cityName.innerHTML = '<h2>' + searchEl.innerText + ' (' + formattedTime + ')</h2> <img src = "http://openweathermap.org/img/wn/' + data.current.weather[0].icon + '@2x.png" />';
-                temp.textContent = 'Temperature: ' + data.current.temp + '°F';
-                wind.textContent = 'Wind: ' + data.current.wind_speed + ' MPH';
-                humidity.textContent = 'Humidity: ' + data.current.humidity + '%';
-                uv.innerHTML = '<p class="mr-2 mt-3">UV Index: </p><div class="rounded-lg p-2 m-2" id="uv-index">' + data.current.uvi + '</div>';
-
-                // creates a div box that holds city info 
-                box.appendChild(cityName);
-                box.appendChild(temp);
-                box.appendChild(wind);
-                box.appendChild(humidity);
-                box.appendChild(uv);
-                outputEl.appendChild(box);
-
-
-                var uvIndex = document.getElementById('uv-index');
-
-                if (data.current.uvi >= 11) {
-                    //purple
-                    uvIndex.style.backgroundColor = '#6c4dbd';
-                }
-                else if (data.current.uvi >= 8) {
-                    //red
-                    uvIndex.style.backgroundColor = '#d22222';
-                }
-                else if (data.current.uvi >= 6) {
-                    //orange
-                    uvIndex.style.backgroundColor = '#f5882f';
-                }
-                else if (data.current.uvi >= 3) {
-                    //yellow
-                    uvIndex.style.backgroundColor = '#ffd966'; 
-                }
-                else {
-                    //green
-                    uvIndex.style.backgroundColor = '#51ed40'; 
-                }
-
-                var futaForecast = document.createElement('div');
-                futaForecast.className = 'd-flex row col justify-content-between mx-auto';
-
-                var futaForecasthead = document.createElement('h3');
-                futaForecasthead.textContent = "5-Day Forecast";
-                futaForecasthead.className = 'd-flex justify-content-center';
-
-                outputEl.appendChild(futaForecasthead);
-
-                for(p = 1; p < 6; p++) {
-                    var indivFutaForecast = document.createElement('div');
-                    indivFutaForecast.setAttribute('date', p);
-                    indivFutaForecast.className = 'bg-secondary p-2 rounded-lg';
-                    var indivFutaForecastD = document.createElement('h4');
-                    var indivFutaForecastWeat = document.createElement('img');
-                    indivFutaForecastWeat.className = 'd-flex justify-content-center';
-                    var indivFutaForecastTemp = document.createElement('p');
-                    var indivFutaForecastWind = document.createElement('p');
-                    var indivFutaForecastHumi = document.createElement('p');
-
-
-                    var unix_timestamp = data.daily[p].dt;
-                    var date = new Date(unix_timestamp * 1000);
-                    var dated = date.getDate();
-                    var datem = date.getMonth() + 1;
-                    var datey = date.getFullYear();
+                    const cityName = document.createElement('div');
+                    cityName.className = 'd-flex row m-2 p-2 align-items-center';
+                    cityName.innerHTML = `<h2>${input} (${time(data, 0)})</h2> <img src="http://openweathermap.org/img/wn/${data.current.weather[0].icon}@2x.png" />`;
                     
-                    var formattedTime = datem + '/' + dated + '/' + datey;
-                    console.log(formattedTime);
-                
-                    indivFutaForecastD.textContent = formattedTime;
-                    indivFutaForecastWeat.src = 'http://openweathermap.org/img/wn/' + data.daily[p].weather[0].icon + '@2x.png';
-                    indivFutaForecastTemp.textContent = 'Temp: ' + data.daily[p].temp.day + '°F';
-                    indivFutaForecastWind.textContent = 'Wind: ' + data.daily[p].wind_speed + ' MPH';
-                    indivFutaForecastHumi.textContent = 'Humidity: ' + data.daily[p].humidity + '%';
+                    const temp = document.createElement('p');
+                    temp.className = 'm-4';
+                    temp.textContent = `Temperature: ${data.current.temp} °F`;
 
-                    indivFutaForecast.appendChild(indivFutaForecastD);
-                    indivFutaForecast.appendChild(indivFutaForecastWeat);
-                    indivFutaForecast.appendChild(indivFutaForecastTemp);
-                    indivFutaForecast.appendChild(indivFutaForecastWind);
-                    indivFutaForecast.appendChild(indivFutaForecastHumi);
-                    futaForecast.appendChild(indivFutaForecast);
-                }
-                    outputEl.appendChild(futaForecast);
+                    const wind = document.createElement('p');
+                    wind.className = 'm-4';
+                    wind.textContent = `Wind: ${data.current.wind_speed} MPH`;
+
+                    const humid = document.createElement('p');
+                    humid.className = 'm-4';
+                    humid.textContent = `Humidity: ${data.current.humidity} %`;
+
+                    const uv = document.createElement('div');
+                    switch (Math.round(data.current.uvi)) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            var uviColor = '#51ed40';
+                        case 3:
+                        case 4:
+                        case 5:
+                            var uviColor = '#ffd966';
+                        case 6:
+                        case 7:
+                            var uviColor = '#f5882f';
+                        case 8:
+                        case 9:
+                        case 10:
+                            var uviColor = '#d22222';
+                        default:
+                            var uviColor = '#6c4dbd';
+                    }
+                    uv.className = 'd-flex m-4 row align-items-centered';
+                    uv.innerHTML = `<p class="mr-2 mt-3">UV Index: </p><div class="rounded-lg p-2 m-2" style='background-color: ${uviColor}' id="uv-index">${data.current.uvi}</div>`;
+
+                    // creates a div box that holds city info 
+                    box.appendChild(cityName);
+                    box.appendChild(temp);
+                    box.appendChild(wind);
+                    box.appendChild(humid);
+                    box.appendChild(uv);
+                    outputEl.appendChild(box);
+
+                    const forecastTitle = document.createElement('h3');
+                    forecastTitle.textContent = '5-Day Forecast';
+                    forecastTitle.className = 'd-flex justify-content-center';
+
+                    outputEl.appendChild(forecastTitle);
+
+                    const forecast = document.createElement('div');
+                    forecast.className = 'd-flex row col justify-content-between mx-auto';
+
+                    for (p=1; p<6; p++) {
+                        const iForecast = document.createElement('div');
+                        iForecast.setAttribute('date', p);
+                        iForecast.className = 'bg-secondary p-2 rounded-lg';
+
+                        const iForeDate = document.createElement('h4');
+                        iForeDate.textContent = time(data, p);
+
+                        const iForeWeather = document.createElement('img');
+                        iForeWeather.src = `http://openweathermap.org/img/wn/${data.daily[p].weather[0].icon}@2x.png`;
+                        iForeWeather.className = 'd-flex justify-content-center';
+
+                        const iForeTemp = document.createElement('p');
+                        iForeTemp.textContent = `Temp: ${data.daily[p].temp.day}°F`;
+
+                        const iForeWind = document.createElement('p');
+                        iForeWind.textContent = `Wind: ${data.daily[p].wind_speed} MPH`;
+
+                        const iForeHumid = document.createElement('p');
+                        iForeHumid.textContent = `Humidity: ${data.daily[p].humidity} %`;
+
+                        iForecast.appendChild(iForeDate);
+                        iForecast.appendChild(iForeWeather);
+                        iForecast.appendChild(iForeTemp);
+                        iForecast.appendChild(iForeWind);
+                        iForecast.appendChild(iForeHumid);
+                        forecast.appendChild(iForecast);
+                    }
+                    outputEl.appendChild(forecast);
+                })
+
         })
-    })
-
 }
 
-var resetSearch = function() {
+const pastSearch = () => {
+    while (pastEl.hasChildNodes()) {
+        pastEl.removeChild(pastEl.firstChild);
+    }
+
+    var number = localStorage.getItem('iNum');
+    console.log(number)
+
+    for (f=0; f<number; f++) {
+        //pulls the name of the past-search and removes the quotation marks
+        var text2 = localStorage.getItem(`past-search-${f}`);
+        console.log(text2)
+        var text = text2.replaceAll('"', '');
+    
+        //creates past search element in the sidebar
+        var searchEl = document.createElement('button');
+        searchEl.textContent = text;
+        searchEl.className = "d-flex col justify-content-center bg-dark mb-3 my-3 rounded";
+        searchEl.id = "past-search-entry";
+        searchEl.setAttribute("onclick", 'pastCity(this)'); //attaches a FXN to each button
+    
+        pastEl.appendChild(searchEl);
+    }
+}
+
+const pastCity = (elem) => {
+    var pastCityName = elem.innerText;
+
+    fetchWeather(pastCityName);
+}
+
+const resetSearch = () => {
     localStorage.clear();
 
-    while (pastSearchEl.hasChildNodes()) {
-        pastSearchEl.removeChild(pastSearchEl.firstChild);
-    }
+    clearSearch();
 }
 
-// Adds eventListener for searchButton to log input value
-searchButtonEl.addEventListener('click', search4City);
-resetButtonEl.addEventListener('click', resetSearch);
+//fxn time
+const time = (data, time) => {
+    //pulls date and time
+    var date = new Date(data.daily[time].dt * 1000);
+    const day = date.getDate();
+    const mon = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const formatTime = `${mon} / ${day} / ${year}`;
 
-pastSearches();
+    return formatTime;
+}
+
+searchEl.addEventListener('click', citySearch);
+resetEl.addEventListener('click', resetSearch);
+
+pastSearch();
