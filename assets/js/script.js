@@ -6,7 +6,6 @@ var pastSearchEl = document.getElementById('past-searches');
 
 var searchEl = document.createElement('button');
 
-
 var i = localStorage.getItem("i", JSON.stringify(i));
 
 // checks if values have already been set
